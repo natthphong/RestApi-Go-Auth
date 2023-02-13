@@ -45,6 +45,7 @@ func main() {
 	authorized := r.Group("/user", middleware.Logger())
 	authorized.GET("/viewUser", user.ReadAll)
 	authorized.GET("/Profile", user.Profile)
+	authorized.PUT("/Update", user.Update)
 
 	r.GET("/", Auth.Home)
 	///router register

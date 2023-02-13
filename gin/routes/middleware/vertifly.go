@@ -25,6 +25,7 @@ func Logger() gin.HandlerFunc {
 			return hmacSampleSecret, nil
 		})
 		if Claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			c.Set("userId", Claims["userId"])
 			c.Set("username", Claims["username"])
 		} else {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Cookie Incorect"})

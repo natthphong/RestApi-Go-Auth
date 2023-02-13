@@ -19,7 +19,8 @@ type RegisterBody struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 	Fullname string `json:"fullname" binding:"required"`
-	Avatar   string `json:"avatar" binding:"required"`
+	Admin    bool   `json:"admin" 	 binding:"required"`
+	Avatar   string `json:"avatar"  binding:"required`
 }
 
 type LoginBody struct {
@@ -48,12 +49,12 @@ func Register(c *gin.Context) {
 
 	//เข้ารหัส
 	enPass, _ := bcrypt.GenerateFromPassword([]byte(json.Password), 10)
-	user := orm.User{Username: json.Username, Password: string(enPass), Fullname: json.Fullname, Avatar: json.Avatar}
+	user := orm.User{Username: json.Username, Password: string(enPass), Fullname: json.Fullname, Admin: json.Admin, Avatar: json.Avatar}
 	orm.Db.Create(&user)
 	if user.ID > 0 {
 		c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "User Create Success", "userId": user.ID})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"status": "error", "message": "User Create Failed"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "User Create Failed"})
 	}
 
 }
@@ -78,10 +79,11 @@ func Login(c *gin.Context) {
 	}
 	hmacSampleSecret = []byte(os.Getenv("JWT_KEY"))
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"userId":   userExit.ID,
 		"username": userExit.Username,
 	})
 	tokenString, err := token.SignedString(hmacSampleSecret)
-	t := http.Cookie{Name: "Tarken", Value: tokenString, Expires: time.Now().Add(1 * time.Minute), HttpOnly: true}
+	t := http.Cookie{Name: "Tarken", Value: tokenString, Expires: time.Now().Add(30 * time.Minute), HttpOnly: true}
 	http.SetCookie(c.Writer, &t)
 	fmt.Println(tokenString, err)
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "Login Success", "token": tokenString})
