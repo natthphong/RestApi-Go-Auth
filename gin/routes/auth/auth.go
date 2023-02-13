@@ -78,7 +78,7 @@ func Login(c *gin.Context) {
 	}
 	hmacSampleSecret = []byte(os.Getenv("JWT_KEY"))
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userId": userExit.ID,
+		"username": userExit.Username,
 	})
 	tokenString, err := token.SignedString(hmacSampleSecret)
 	t := http.Cookie{Name: "Tarken", Value: tokenString, Expires: time.Now().Add(1 * time.Minute), HttpOnly: true}

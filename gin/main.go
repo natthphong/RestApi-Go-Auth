@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"tar/jwt-api/orm"
 	Auth "tar/jwt-api/routes/auth"
+	"tar/jwt-api/routes/middleware"
 	"tar/jwt-api/routes/user"
 
 	"github.com/gin-contrib/cors"
@@ -36,13 +37,19 @@ func main() {
 		fmt.Print("Error loading .env file")
 	}
 	orm.InitDB()
+
 	r := gin.Default()
 	r.Use(cors.Default())
+
+	//สำหรับผู้ใช้
+	authorized := r.Group("/user", middleware.Logger())
+	authorized.GET("/viewUser", user.ReadAll)
+	authorized.GET("/Profile", user.Profile)
 
 	r.GET("/", Auth.Home)
 	///router register
 	r.POST("/register", Auth.Register)
 	r.POST("/login", Auth.Login)
-	r.GET("/viewUser", user.ReadAll)
+
 	r.Run("localhost:9999") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
