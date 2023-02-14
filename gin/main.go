@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"tar/jwt-api/orm"
 	Auth "tar/jwt-api/routes/auth"
 	"tar/jwt-api/routes/middleware"
@@ -40,13 +41,14 @@ func main() {
 
 	r := gin.Default()
 	r.Use(cors.Default())
-
+	r.StaticFS("/file", http.Dir("public"))
 	//สำหรับผู้ใช้
 	authorized := r.Group("/user", middleware.Logger())
 	authorized.GET("/viewUser", user.ReadAll)
 	authorized.GET("/Profile", user.Profile)
 	authorized.PUT("/Update", user.Update)
-
+	authorized.DELETE("/Delete/:id", user.Delete)
+	authorized.POST("/Upload", user.Upload)
 	r.GET("/", Auth.Home)
 	///router register
 	r.POST("/register", Auth.Register)

@@ -20,7 +20,7 @@ type RegisterBody struct {
 	Password string `json:"password" binding:"required"`
 	Fullname string `json:"fullname" binding:"required"`
 	Admin    bool   `json:"admin" 	 binding:"required"`
-	Avatar   string `json:"avatar"  binding:"required`
+	Avatar   string `json:"avatar"`
 }
 
 type LoginBody struct {
@@ -29,7 +29,6 @@ type LoginBody struct {
 }
 
 func Register(c *gin.Context) {
-
 	//ประกาศ json เป็น model register
 	var json RegisterBody
 
