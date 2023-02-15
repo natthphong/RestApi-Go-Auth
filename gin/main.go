@@ -46,9 +46,11 @@ func main() {
 	authorized := r.Group("/user", middleware.Logger())
 	authorized.GET("/viewUser", user.ReadAll)
 	authorized.GET("/Profile", user.Profile)
-	authorized.PUT("/Update", user.Update)
+	authorized.PUT("/Update/:id", user.Update)
 	authorized.DELETE("/Delete/:id", user.Delete)
 	authorized.POST("/Upload", user.Upload)
+	authorized.POST("/Auth", user.Auth)
+
 	r.GET("/", Auth.Home)
 	///router register
 	r.POST("/register", Auth.Register)

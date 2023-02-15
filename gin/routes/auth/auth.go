@@ -29,14 +29,21 @@ type LoginBody struct {
 }
 
 func Register(c *gin.Context) {
+
+	fmt.Print("Call APi Success")
+
 	//ประกาศ json เป็น model register
 	var json RegisterBody
 
 	//รับJSON จาก body ลง json ที่ประกาศ
+
 	if err := c.BindJSON(&json); err != nil {
+		fmt.Print("Bindjsonnot success")
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
+
+	fmt.Print("BindJSON")
 
 	//เช็ค username
 	var userExit orm.User
@@ -82,14 +89,14 @@ func Login(c *gin.Context) {
 		"username": userExit.Username,
 	})
 	tokenString, err := token.SignedString(hmacSampleSecret)
-	t := http.Cookie{Name: "Tarken", Value: tokenString, Expires: time.Now().Add(30 * time.Minute), HttpOnly: true}
+	t := http.Cookie{Name: "Tarken", Value: tokenString, Expires: time.Now().Add(3 * time.Hour), HttpOnly: true}
 	http.SetCookie(c.Writer, &t)
 	fmt.Println(tokenString, err)
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "Login Success", "token": tokenString})
 }
 
 func Home(c *gin.Context) {
-
+	fmt.Print("Call APi Success")
 	orm.Hello()
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "Hello world"})
 

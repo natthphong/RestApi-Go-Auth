@@ -31,7 +31,7 @@ func Profile(c *gin.Context) {
 }
 
 func Update(c *gin.Context) {
-
+	fmt.Print("Update")
 	var json orm.User
 	message := "Update Already"
 	if err := c.BindJSON(&json); err != nil {
@@ -43,16 +43,17 @@ func Update(c *gin.Context) {
 	orm.Db.Where("username = ?", json.Username).First(&userExit)
 
 	enPass, _ := bcrypt.GenerateFromPassword([]byte(json.Password), 10)
-	userId := c.MustGet("userId").(float64)
+	userId := c.Param("id")
 	var user orm.User
 	orm.Db.Where("id = ?", userId).Find(&user)
-
+	orm.Db.Model(&user).Updates(orm.User{Username: json.Username, Password: string(enPass), Fullname: json.Fullname, Avatar: json.Avatar})
 	if userExit.ID > 0 {
 		json.Username = user.Username
 		message = "Update but Username Already used"
+		c.JSON(http.StatusAccepted, gin.H{"status": "okBut", "message": message, "user": user})
+		return
 	}
 
-	orm.Db.Model(&user).Updates(orm.User{Username: json.Username, Password: string(enPass), Fullname: json.Fullname, Avatar: json.Avatar})
 	c.JSON(http.StatusAccepted, gin.H{"status": "ok", "message": message, "user": user})
 
 }
@@ -65,7 +66,7 @@ func Delete(c *gin.Context) {
 	var user orm.User
 	orm.Db.Where("id = ?", userId).Find(&user)
 	if Admin == false {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "err", "message": "Not Admin"})
+		c.JSON(http.StatusAccepted, gin.H{"status": "err", "message": "Not Admin"})
 	} else if user.ID > 0 {
 		orm.Db.Unscoped().Delete(&user)
 		c.JSON(http.StatusAccepted, gin.H{"status": "ok", "message": "Delete", "Delete user": user})
@@ -105,4 +106,9 @@ func Upload(c *gin.Context) {
 	user.Avatar = avatar
 	orm.Db.Save(user)
 	c.JSON(http.StatusAccepted, gin.H{"status": "ok", "message": "Delete", "avatar": avatar})
+}
+
+func Auth(c *gin.Context) {
+
+	c.JSON(http.StatusAccepted, gin.H{"status": "ok"})
 }
