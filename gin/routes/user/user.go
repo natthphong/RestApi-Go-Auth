@@ -34,6 +34,7 @@ func Update(c *gin.Context) {
 	fmt.Print("Update")
 	var json orm.User
 	message := "Update Already"
+	status := "ok"
 	if err := c.BindJSON(&json); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -44,17 +45,20 @@ func Update(c *gin.Context) {
 
 	enPass, _ := bcrypt.GenerateFromPassword([]byte(json.Password), 10)
 	userId := c.Param("id")
+	fmt.Print(userId)
 	var user orm.User
 	orm.Db.Where("id = ?", userId).Find(&user)
-	orm.Db.Model(&user).Updates(orm.User{Username: json.Username, Password: string(enPass), Fullname: json.Fullname, Avatar: json.Avatar})
+	fmt.Print(user)
 	if userExit.ID > 0 {
 		json.Username = user.Username
 		message = "Update but Username Already used"
-		c.JSON(http.StatusAccepted, gin.H{"status": "okBut", "message": message, "user": user})
-		return
+		status = "okBut"
 	}
 
-	c.JSON(http.StatusAccepted, gin.H{"status": "ok", "message": message, "user": user})
+	fmt.Print(json.Username)
+	orm.Db.Model(&user).Updates(orm.User{Username: json.Username, Password: string(enPass), Fullname: json.Fullname, Avatar: json.Avatar})
+
+	c.JSON(http.StatusAccepted, gin.H{"status": status, "message": message, "user": user})
 
 }
 

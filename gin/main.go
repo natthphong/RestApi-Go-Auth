@@ -49,6 +49,7 @@ func main() {
 	authorized.PUT("/Update/:id", user.Update)
 	authorized.DELETE("/Delete/:id", user.Delete)
 	authorized.POST("/Upload", user.Upload)
+	authorized.POST("/Logout", Auth.Logout)
 	authorized.POST("/Auth", user.Auth)
 
 	r.GET("/", Auth.Home)

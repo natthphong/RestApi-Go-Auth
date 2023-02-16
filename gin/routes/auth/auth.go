@@ -89,7 +89,7 @@ func Login(c *gin.Context) {
 		"username": userExit.Username,
 	})
 	tokenString, err := token.SignedString(hmacSampleSecret)
-	t := http.Cookie{Name: "Tarken", Value: tokenString, Expires: time.Now().Add(3 * time.Hour), HttpOnly: true}
+	t := http.Cookie{Name: "Tarken", Value: tokenString, Expires: time.Now().Add(1 * time.Hour), HttpOnly: true}
 	http.SetCookie(c.Writer, &t)
 	fmt.Println(tokenString, err)
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "Login Success", "token": tokenString})
@@ -100,4 +100,21 @@ func Home(c *gin.Context) {
 	orm.Hello()
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "Hello world"})
 
+}
+
+func Logout(c *gin.Context) {
+	_, err := c.Cookie("Tarken")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"status": "error", "message": "not login"})
+	}
+
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "Tarken",
+		Path:     "/",
+		HttpOnly: false,
+		Secure:   false,
+		Domain:   "localhost",
+		Expires:  time.Now(),
+		MaxAge:   -1})
+	c.JSON(http.StatusOK, gin.H{"status": "ok", "message": "Logout Success"})
 }

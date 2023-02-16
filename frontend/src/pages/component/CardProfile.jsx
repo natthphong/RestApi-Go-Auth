@@ -38,6 +38,7 @@ export default function MediaCard({ item, callback,Update}) {
       Update(id,valueUpdate)
       alert("Update Already");
     } else if (res.data.status ==="okBut"){
+      setvalueUpdate({...valueUpdate , Username:item.Username})
       Update(id,valueUpdate)
       alert("Username Already Used But Fullname Update Already");
     }else {
